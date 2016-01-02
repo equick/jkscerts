@@ -41,7 +41,8 @@ EOF
       1 ) echo "$EXPIRES (WARNING)" ;;
       2 ) echo "$EXPIRES (CRITICAL)" ;;
     esac
+    unset ALIAS OWNER ISSUER VALIDFROM EXPIRES
+    echo
   fi
-  echo
 done
 rm -f $TMPFILE
