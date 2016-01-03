@@ -31,6 +31,11 @@ function check_status(){
   fi
 }
 
+function finish(){
+  rm -f $TMPFILE
+}
+
+
 while getopts "chk:t:wv" arg; do
   case $arg in
     c) show_critical=1
@@ -54,9 +59,20 @@ done
 
 [[ -z $WARNING_PERIOD ]] && WARNING_PERIOD='3 months'
 
+if [[ ! -e $KEYSTORE ]]; then
+  echo "KEYSTORE: $KEYSTORE not found. Check location."
+  exit 1
+fi
+
+if [[ ! -r $KEYSTORE ]]; then
+  echo "KEYSTORE: $KEYSTORE is not readable. Check permissions."
+  exit 1
+fi
+
 TMPFILE=$(mktemp)
+trap finish EXIT
+
 java ChangeSourceKeystorePassword $KEYSTORE $TMPFILE
-#check keystore here
 
 declare -A CERTLIST
 
@@ -110,9 +126,6 @@ EOF
     reset_vars
   fi
 done < <(keytool -list -v -keystore $TMPFILE -storepass secret)
-
-# remove the keystore copy
-rm -f $TMPFILE
 
 # render the output
 if [[ -z $verbose ]]; then
