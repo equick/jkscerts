@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function usage(){
+  cat <<EOF
+Usage: $0 -k <keystore>
+                        Display all certificates and status
+      -v                Display all certificates and status (verbose)
+      -w                Display all certificates due to expire (default: in next 3 months)
+      -w -t '1 week'    Display all certificates due to expire in 1 week
+      -w -t '2 weeks'   Display all certificates due to expire in 2 weeks
+      -w -t '2 months'  Display all certificates due to expire in 2 months
+      -c                Display all certificates that have already expired
+EOF
+  exit
+}
+
 function reset_vars(){
   unset ALIAS OWNER ISSUER VALIDFROM EXPIRES STATUS
 }
@@ -7,7 +21,7 @@ function reset_vars(){
 function check_status(){
   EXPIRYDATESECS=$(date --date "$1" +%s)
   NOW=$(date +%s)
-  THEN=$(date --date '3 months' +%s)
+  THEN=$(date --date "$WARNING_PERIOD" +%s)
   if [ $EXPIRYDATESECS -gt $THEN ]; then
     return 0
   elif [ $EXPIRYDATESECS -gt $NOW ]; then
@@ -17,21 +31,28 @@ function check_status(){
   fi
 }
 
-
-while getopts "chk:mw" arg; do
+while getopts "chk:t:wv" arg; do
   case $arg in
     c) show_critical=1
        ;;
-    h) echo "usage" 
+    h) usage
        ;;
     k) KEYSTORE=$OPTARG
        ;;
-    m) check_mk=1
+    t) WARNING_PERIOD=$OPTARG
+       ;;
+    v) verbose=1
        ;;
     w) show_warning=1
        ;;
+    *) usage
+       ;;
   esac
 done
+
+[[ -z $KEYSTORE ]] && usage
+
+[[ -z $WARNING_PERIOD ]] && WARNING_PERIOD='3 months'
 
 TMPFILE=$(mktemp)
 java ChangeSourceKeystorePassword $KEYSTORE $TMPFILE
@@ -73,7 +94,7 @@ while read -r x; do
           ;;
     esac
 
-    if [[ -n $check_mk ]]; then
+    if [[ -z $verbose ]]; then
       CERTLIST["$ALIAS"]="$CERTSTATUS - ALIAS: $ALIAS, CN: $CN, EXPIRES: $EXPIRES, KEYSTORE: $KEYSTORE"
     else
       CERTLIST["$ALIAS"]=$(cat <<EOF
@@ -94,7 +115,7 @@ done < <(keytool -list -v -keystore $TMPFILE -storepass secret)
 rm -f $TMPFILE
 
 # render the output
-if [[ -n $check_mk ]]; then
+if [[ -z $verbose ]]; then
   for K in "${!CERTLIST[@]}"; do 
     echo "${CERTLIST[$K]}"
   done | sort -k 3
