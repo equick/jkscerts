@@ -64,3 +64,33 @@ VALID FROM: Tue Dec 17 09:23:49 GMT 2002
 EXPIRES: Wed Dec 16 09:15:38 GMT 2015
 STATUS: CRITICAL
 ```
+
+## TROUBLESHOOTING
+
+If you get the following error:
+```
+-bash-4.1$ ./jkscerts.sh -k ./demokeystore.jks 
+Exception in thread "main" java.lang.UnsupportedClassVersionError: ChangeSourceKeystorePassword : Unsupported major.minor version 52.0
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:792)
+	at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:142)
+	at java.net.URLClassLoader.defineClass(URLClassLoader.java:449)
+	at java.net.URLClassLoader.access$100(URLClassLoader.java:71)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:361)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:355)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:354)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:308)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at sun.launcher.LauncherHelper.checkAndLoadMain(LauncherHelper.java:482)
+```
+
+Then recompile the java classes as shown here with your own version of java:
+```
+-bash-4.1$ javac ChangeSourceKeystorePassword.java JKS.java
+Note: JKS.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+-bash-4.1$ ls *.class
+ChangeSourceKeystorePassword.class  JKS.class
+```
