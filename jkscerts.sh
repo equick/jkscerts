@@ -18,6 +18,7 @@ function reset_vars(){
   unset ALIAS OWNER ISSUER VALIDFROM EXPIRES STATUS
 }
 
+# Check the supplied date to see if it has expired or falls within the warning period
 function check_status(){
   EXPIRYDATESECS=$(date --date "$1" +%s)
   NOW=$(date +%s)
@@ -70,12 +71,17 @@ if [[ ! -r $KEYSTORE ]]; then
 fi
 
 TMPFILE=$(mktemp)
+
+# Set trap to delete keystore copy on exit
 trap finish EXIT
 
+# Copy the keystore to a temporary file with a known password
 java ChangeSourceKeystorePassword $KEYSTORE $TMPFILE
 
+# Associative array to store certificate details
 declare -A CERTLIST
 
+# Run keytool -list -v on the keystore and parse the raw output
 while read -r x; do
   case "$x" in
     Alias* ) ALIAS=$(echo "$x" | sed 's/Alias name: //')
@@ -127,7 +133,7 @@ EOF
   fi
 done < <(keytool -list -v -keystore $TMPFILE -storepass secret)
 
-# render the output
+# Display the results
 if [[ -z $verbose ]]; then
   for K in "${!CERTLIST[@]}"; do 
     echo "${CERTLIST[$K]}"
