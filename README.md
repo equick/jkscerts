@@ -27,7 +27,20 @@ bash-4.3$ ./jkscerts.sh -k demokeystore.jks
 CRITICAL - ALIAS: linuxproblems, CN: linuxproblems.org, EXPIRES: Fri Jan 13 08:19:30 GMT 2012, KEYSTORE: demokeystore.jks
 ```
 
-Display certificates in /etc/pki/java/cacerts due to expire in the next 3 months:
+List all certificates in /usr/java/jre1.8.0_45/lib/security/cacerts:
+```
+bash-4.3$ ./jkscerts.sh -k /usr/java/jre1.8.0_45/lib/security/cacerts
+OK - ALIAS: addtrustclass1ca, CN: AddTrust Class 1 CA Root, EXPIRES: Sat May 30 11:38:31 BST 2020, KEYSTORE: /usr/java/jre1.8.0_45/lib/security/cacerts
+OK - ALIAS: addtrustexternalca, CN: AddTrust External CA Root, EXPIRES: Sat May 30 11:48:38 BST 2020, KEYSTORE: /usr/java/jre1.8.0_45/lib/security/cacerts
+OK - ALIAS: addtrustqualifiedca, CN: AddTrust Qualified CA Root, EXPIRES: Sat May 30 11:44:50 BST 2020, KEYSTORE: /usr/java/jre1.8.0_45/lib/security/cacerts
+OK - ALIAS: affirmtrustcommercialca, CN: AffirmTrust Commercial, EXPIRES: Tue Dec 31 14:06:06 GMT 2030, KEYSTORE: /usr/java/jre1.8.0_45/lib/security/cacerts
+OK - ALIAS: affirmtrustnetworkingca, CN: AffirmTrust Networking, EXPIRES: Tue Dec 31 14:08:24 GMT 2030, KEYSTORE: /usr/java/jre1.8.0_45/lib/security/cacerts
+OK - ALIAS: affirmtrustpremiumca, CN: AffirmTrust Premium, EXPIRES: Mon Dec 31 14:10:36 GMT 2040, KEYSTORE: /usr/java/jre1.8.0_45/lib/security/cacerts
+..
+..
+```
+
+Show certificates in /etc/pki/java/cacerts due to expire in the next 3 months:
 ```
 bash-4.3$ ./jkscerts.sh -k /etc/pki/java/cacerts -w
 WARNING - ALIAS: cadisig, CN: CA Disig, EXPIRES: Tue Mar 22 01:39:34 GMT 2016, KEYSTORE: /etc/pki/java/cacerts
@@ -41,7 +54,7 @@ WARNING - ALIAS: ebgelektroniksertifikahizmetsa\xc4\x9flay\xc4\xb1\x63\xc4\xb1s\
 WARNING - ALIAS: juur-sk, CN: Juur-SK, EXPIRES: Fri Aug 26 15:23:01 BST 2016, KEYSTORE: /etc/pki/java/cacerts
 ```
 
-Display expired certificates in /etc/pki/java/cacerts using verbose format:
+List expired certificates in /etc/pki/java/cacerts using verbose format:
 ```
 bash-4.3$ ./jkscerts.sh -k /etc/pki/java/cacerts -c -v
 ALIAS: staatdernederlandenrootca
